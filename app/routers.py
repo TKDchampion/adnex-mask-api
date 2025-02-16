@@ -1,3 +1,3 @@
-from app.routes import pharmacy, user
+from app.routes import pharmacy, user, transaction
 
-ROUTERS = [pharmacy, user]
+ROUTERS = [pharmacy, user, transaction]
