@@ -1,0 +1,26 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Python auto create
+*.swp
+*.swo
+*.log
+
+# virtualenv
+venv/
+.env/
+.venv/
+
+# conda
+conda_env/
+
+# env
+.env
+*.env
+config.json
+secrets.json
+*.pem  # 金鑰檔案
+
+# macOS trash file
+.DS_Store
