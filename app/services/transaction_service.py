@@ -13,7 +13,6 @@ class TransactionService:
         transactions = TransactionRepo.get_transactions(db, start_date, end_date)
         summary = TransactionRepo.get_transaction_summary(db, start_date, end_date)
 
-        # `summary` 可能是 SQLAlchemy Row 或 None
         if summary:
             total_transactions = summary.total_transactions if hasattr(summary, "total_transactions") else 0
             total_amount = summary.total_amount if hasattr(summary, "total_amount") else 0

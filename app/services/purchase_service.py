@@ -11,7 +11,7 @@ class PurchaseService:
     def process_purchase(db: Session, user_id: int, pharmacy_id: int, mask_id: int, quantity: int):
         """
         Buy Mask Deals based on ACID rules
-        1. 檢查 user, pharmacy, mask 是否存在
+        1. Check user, pharmacy, mask
         2. Check user's balance
         3. Use ACID：
             - minus `users.cash_balance`

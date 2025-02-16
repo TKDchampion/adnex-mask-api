@@ -12,5 +12,17 @@ services:
     networks:
       - backend
 
+  fastapi:
+    build: .
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - backend
+
 networks:
   backend:
