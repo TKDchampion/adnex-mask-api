@@ -1,13 +1,17 @@
 from fastapi import FastAPI
 import psycopg2
-
 from app.database import DATABASE_URL
+from app.routers import ROUTERS
 
 app = FastAPI(
     title="Pharmacy API",
     description="A simple API to manage pharmacies",
     version="1.0.0"
 )
+
+for router in ROUTERS:
+    app.include_router(router.router)
+
 
 @app.get("/")
 def read_root():
