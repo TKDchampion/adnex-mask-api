@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+import psycopg2
+
+from app.database import DATABASE_URL
 
 app = FastAPI(
     title="Pharmacy API",
@@ -9,3 +12,15 @@ app = FastAPI(
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Pharmacy API"}
+
+@app.get("/db-test")
+def test_db():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("SELECT version();")
+        db_version = cur.fetchone()
+        conn.close()
+        return {"db_version": db_version}
+    except Exception as e:
+        return {"error": str(e)}
