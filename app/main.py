@@ -6,7 +6,7 @@ from app.routers import ROUTERS
 app = FastAPI(
     title="Pharmacy API",
     description="A simple API to manage pharmacies",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 for router in ROUTERS:

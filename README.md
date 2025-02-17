@@ -2,7 +2,8 @@
 
 This is a mask API application that interacts with a database. You can either set up the environment manually or directly start a Docker container. Once set up, you can start using it.
 
-[Demo api](https://)
+[Swagger UI](https://adnex-mask-api-production.up.railway.app/docs#/)
+[ReDoc UI](https://adnex-mask-api-production.up.railway.app/redoc#/)
 
 ## Envirement
 
@@ -76,8 +77,8 @@ uvicorn app.main:app --reload
 
 ### Doc & UI
 
-- Swagger UI: http://127.0.0.1:8000/docs
-- ReDoc: http://127.0.0.1:8000/redoc
+- Swagger UI: http://127.0.0.1:8000/docs#/
+- ReDoc: http://127.0.0.1:8000/redoc#/
 
 ### Unit test
 
