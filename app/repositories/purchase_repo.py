@@ -21,7 +21,7 @@ class PurchaseRepo:
     def update_user_balance(db: Session, user: User, prev_updated_at):
         return (
             db.query(User)
-            .filter(User.id == user.id, User.updated_at == prev_updated_at)  # 確保 updated_at 沒變
+            .filter(User.id == user.id, User.updated_at == prev_updated_at)
             .update({"cash_balance": user.cash_balance, "updated_at": user.updated_at})
         )
 
@@ -29,7 +29,7 @@ class PurchaseRepo:
     def update_pharmacy_balance(db: Session, pharmacy: Pharmacy, prev_updated_at):
         return (
             db.query(Pharmacy)
-            .filter(Pharmacy.id == pharmacy.id, Pharmacy.updated_at == prev_updated_at)  # 確保 updated_at 沒變
+            .filter(Pharmacy.id == pharmacy.id, Pharmacy.updated_at == prev_updated_at)
             .update({"cash_balance": pharmacy.cash_balance, "updated_at": pharmacy.updated_at})
         )
 

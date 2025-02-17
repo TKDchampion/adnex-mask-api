@@ -25,17 +25,6 @@ class PharmacyRepo:
         Get all pharmacies
         """
         return db.query(Pharmacy).all()
-
-    @staticmethod
-    def get_mask_count_by_pharmacy(db: Session):
-        """
-        Get mask count grouped by pharmacy
-        """
-        return (
-            db.query(Mask.pharmacy_id, func.count(Mask.id).label("mask_count"))
-            .group_by(Mask.pharmacy_id)
-            .all()
-        )
     
     @staticmethod
     def get_pharmacies_with_masks_and_hours(
