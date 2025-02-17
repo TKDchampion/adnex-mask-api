@@ -1,4 +1,5 @@
-from sqlalchemy import func
+from datetime import datetime
+from sqlalchemy import and_, exists, func
 from sqlalchemy.orm import Session
 from app.models.business_hours import BusinessHours
 from app.models.pharmacy import Pharmacy
@@ -35,39 +36,72 @@ class PharmacyRepo:
             .group_by(Mask.pharmacy_id)
             .all()
         )
-
+    
     @staticmethod
-    def get_pharmacies_with_masks(db: Session, mask_count: int, min_price: float, max_price: float):
+    def get_pharmacies_with_masks_and_hours(
+        db: Session, 
+        mask_count: int, 
+        min_price: float, 
+        max_price: float,
+        day: str = None, 
+        time: str = None
+    ):
         """
-        Get pharmacies that have masks within a price range
+        Get pharmacies that:
+        - Have masks within a price range.
+        - Have at least `mask_count` masks.
+        - Are open on the given `day` and `time` (if provided).
         """
-        filtered_masks = db.query(Mask).filter(Mask.price >= min_price, Mask.price <= max_price).subquery()
+        filtered_masks = db.query(Mask).filter(
+            Mask.price >= min_price,
+            Mask.price <= max_price
+        ).subquery()
 
         mask_count_subquery = (
             db.query(
                 filtered_masks.c.pharmacy_id,
-                func.count(filtered_masks.c.id).label("mask_count")
+                func.count(filtered_masks.c.id).label("mask_count"),
+                func.json_agg(
+                    func.json_build_object(
+                        "id", filtered_masks.c.id,
+                        "name", filtered_masks.c.name,
+                        "price", filtered_masks.c.price
+                    )
+                ).label("masks")
             )
             .group_by(filtered_masks.c.pharmacy_id)
             .having(func.count(filtered_masks.c.id) >= mask_count)
             .subquery()
         )
 
-        return (
-            db.query(Pharmacy)
-            .join(mask_count_subquery, Pharmacy.id == mask_count_subquery.c.pharmacy_id)
-            .all()
-        )
+        final_query = db.query(
+            Pharmacy.id,
+            Pharmacy.name,
+            Pharmacy.cash_balance,
+            mask_count_subquery.c.masks
+        ).join(mask_count_subquery, Pharmacy.id == mask_count_subquery.c.pharmacy_id)
 
-    @staticmethod
-    def get_pharmacies_by_business_hours(db: Session, day: str, time: str = None):
-        """
-        Get pharmacies based on business hours
-        """
-        query = db.query(Pharmacy).join(BusinessHours, Pharmacy.id == BusinessHours.pharmacy_id)
-        query = query.filter(BusinessHours.weekday == day)
+        if day or time:
+            conditions = []
+            if day:
+                conditions.append(BusinessHours.weekday == day)
+            if time:
+                try:
+                    time_obj = datetime.strptime(time, "%H:%M").time()
+                    conditions.append(and_(
+                        BusinessHours.open_time <= time_obj,
+                        BusinessHours.close_time > time_obj
+                    ))
+                except ValueError:
+                    raise ValueError("Invalid time format. Expected HH:MM.")
 
-        if time:
-            query = query.filter(BusinessHours.open_time <= time, BusinessHours.close_time >= time)
-
-        return query.distinct().all()
+            final_query = final_query.filter(
+                exists().where(
+                    and_(
+                        BusinessHours.pharmacy_id == Pharmacy.id,
+                        *conditions
+                    )
+                )
+            )
+            
+        return final_query
