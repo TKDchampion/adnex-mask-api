@@ -8,11 +8,8 @@ class SearchRepo:
     def search_pharmacies_and_masks(db: Session, query: str):
         """
         Fuzzy search for `pharmacies.name` or `masks.name`
-        - Use `ILIKE` for broad matching
-        - Use `similarity()` to rank by relevance
+        - Use `similarity()`
         """
-
-        search_term = f"%{query}%"
 
         pharmacy_results = (
             db.query(
@@ -20,7 +17,7 @@ class SearchRepo:
                 Pharmacy.name, 
                 Pharmacy.cash_balance, 
                 func.similarity(Pharmacy.name, query).label("similarity"))
-            .filter(Pharmacy.name.ilike(search_term))
+            .filter(func.similarity(Pharmacy.name, query) > 0.3)
             .order_by(desc("similarity"))
             .all()
         )
@@ -31,7 +28,7 @@ class SearchRepo:
                 Mask.name, 
                 Mask.pharmacy_id, 
                 Mask.price,func.similarity(Mask.name, query).label("similarity"))
-            .filter(Mask.name.ilike(search_term))
+            .filter(func.similarity(Mask.name, query) > 0.3)
             .order_by(desc("similarity"))
             .all()
         )

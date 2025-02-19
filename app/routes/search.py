@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.get("/search", response_model=SearchResponse)
 def search(
-    q: str = Query(..., description="Search keywords: Mask"),
+    q: str = Query(..., description="Search keywords: MaskT"),
     db: Session = Depends(get_db)
 ):
     """
